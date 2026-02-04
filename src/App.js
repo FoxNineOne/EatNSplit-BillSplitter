@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEffect } from "react";
 const initialFriends = [
   {
     id: 118836,
@@ -29,9 +30,20 @@ function Button({ children, onClick }) {
 }
 
 export default function App() {
-  const [friends, setFriends] = useState(initialFriends);
+  //const [friends, setFriends] = useState(initialFriends);
+  //Update : Utilise local storage to allow saving and reloading
+  const [friends, setFriends] = useState(() => {
+    const stored = localStorage.getItem("friends");
+    return stored ? JSON.parse(stored) : initialFriends;
+  });
+
   const [showAddFriend, setShowAddFriend] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState(null);
+
+  // Update Save to local storage
+  useEffect(() => {
+    localStorage.setItem("friends", JSON.stringify(friends));
+  }, [friends]);
 
   function handleShowAddFriend() {
     setShowAddFriend((show) => !show);
@@ -181,13 +193,13 @@ function FormSplitBill({ selectedFriend, onSplitBill }) {
       <h2>Split a bill with {selectedFriend.name}</h2>
       <label>💷Bill Value</label>
       <input
-        type="text"
+        type="number"
         value={bill}
         onChange={(e) => setBill(Number(e.target.value))}
       />
       <label>👤 Your Expense</label>
       <input
-        type="text"
+        type="number"
         value={paidByUser}
         onChange={(e) =>
           setPaidByUser(
